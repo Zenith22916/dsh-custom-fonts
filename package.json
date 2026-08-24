@@ -1,0 +1,51 @@
+{
+  "name": "dsh-ui-font",
+  "version": "1.0.0",
+  "description": "Customize the DeepSeek Harness UI's Chinese and English fonts on a settings page with a live preview — 在设置页自定义界面中文字体与英文字体，实时预览、全局生效。",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "dsh-plugin",
+    "cordis",
+    "font",
+    "fonts",
+    "chinese",
+    "english",
+    "ui",
+    "字体",
+    "中文字体",
+    "英文字体"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsh2002/dsh-ui-font.git"
+  },
+  "homepage": "https://github.com/lsh2002/dsh-ui-font",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./client/client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    }
+  },
+  "files": [
+    "lib",
+    "client",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
