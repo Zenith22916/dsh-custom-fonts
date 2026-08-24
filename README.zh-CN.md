@@ -1,4 +1,4 @@
-# dsh-ui-font
+# dsh-custom-fonts
 
 在 DeepSeek Harness Web 界面自定义**中文字体**、**英文字体**、**代码字体**与**全局字号偏移** —— 设置页直接操作，实时预览。
 
@@ -20,7 +20,7 @@
 插件注入一段全局样式：
 
 ```css
-:root { --dsh-ui-font-en: '英文字体'; --dsh-ui-font-zh: '中文字体'; }
+:root { --dsh-custom-fonts-en: '英文字体'; --dsh-custom-fonts-zh: '中文字体'; }
 body, body * { font-family: '英文字体', '中文字体' !important; }
 pre, code, kbd, samp { font-family: '代码字体' !important; }
 body, body * { font-size: calc(1em + 2px) !important; }  /* 偏移非 0 时 */
@@ -37,20 +37,20 @@ body, body * { font-size: calc(1em + 2px) !important; }  /* 偏移非 0 时 */
 市场发布后可从 **设置 → 插件市场** 一键安装，或：
 
 ```sh
-dsh plugin --profile web add dsh-ui-font
+dsh plugin --profile web add dsh-custom-fonts
 ```
 
 或直接从仓库安装：
 
 ```sh
-dsh plugin --profile web add github:lsh2002/dsh-ui-font
+dsh plugin --profile web add github:lsh2002/dsh-custom-fonts
 ```
 
 纯客户端插件：刷新页面即生效，无需重启。
 
 ## 卸载
 
-在 **设置 → 插件 → 插件配置** 中移除（或 `dsh plugin --profile web remove dsh-ui-font`），刷新页面后字体自动还原。
+在 **设置 → 插件 → 插件配置** 中移除（或 `dsh plugin --profile web remove dsh-custom-fonts`），刷新页面后字体自动还原。
 
 ## 许可证
 

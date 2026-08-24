@@ -18,8 +18,8 @@ How this plugin gets released and listed.
    ```
 
 4. Create a GitHub Release for the version tag and attach the generated
-   `dsh-ui-font-<version>.tgz`. Keep asset name and version aligned.
-5. Update the `tarball:` line in `data/plugins/lsh2002__dsh-ui-font.yml`
+   `dsh-custom-fonts-<version>.tgz`. Keep asset name and version aligned.
+5. Update the `tarball:` line in `data/plugins/lsh2002__dsh-custom-fonts.yml`
    (awesome-dsh-plugin) if it names a versioned asset URL.
 
 ## 2. Marketplace listing
@@ -28,7 +28,7 @@ The community catalog lives at
 [awesome-dsh-plugin/awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin);
 submissions are one YAML file per plugin:
 
-- File: `data/plugins/lsh2002__dsh-ui-font.yml`
+- File: `data/plugins/lsh2002__dsh-custom-fonts.yml`
 - Category: `ui`
 - The repo must exist for **at least 1 day** and carry **at least 10 commits**
   (automated CI checks).
@@ -36,7 +36,7 @@ submissions are one YAML file per plugin:
 - After adding/updating the YAML, regenerate the two READMEs with
   `node scripts/generate-readme.mjs` in that repo and commit together with the YAML.
 - Optional but recommended: screenshots under `data/screenshots.json` keyed by
-  `https://github.com/lsh2002/dsh-ui-font`, pointing at images hosted on
+  `https://github.com/lsh2002/dsh-custom-fonts`, pointing at images hosted on
   GitHub (e.g. `raw.githubusercontent.com`).
 
 ## 3. npm (optional)

@@ -1,5 +1,5 @@
 /**
- * dsh-ui-font — client bundle.
+ * dsh-custom-fonts — client bundle.
  *
  * Customizes the global UI fonts on a settings page:
  *   - "UI fonts":  "英文字体 / English font" for Latin characters and
@@ -22,7 +22,7 @@
  * The factory's only external is `react` from the loader module table.
  */
 window.__ModuleLoader__.load({
-  id: 'dsh-ui-font',
+  id: 'dsh-custom-fonts',
   factory: (require) => {
     const { createElement, useState } = require('react')
 
@@ -66,8 +66,8 @@ window.__ModuleLoader__.load({
       const offset = Number(o.size) || 0
       const rules = []
       const vars = []
-      if (enQ) vars.push('--dsh-ui-font-en: ' + enQ)
-      if (zhQ) vars.push('--dsh-ui-font-zh: ' + zhQ)
+      if (enQ) vars.push('--dsh-custom-fonts-en: ' + enQ)
+      if (zhQ) vars.push('--dsh-custom-fonts-zh: ' + zhQ)
       const uiStack = [enQ, zhQ].filter(Boolean).join(', ')
       if (uiStack) {
         rules.push('body, body * { font-family: ' + uiStack + ' !important; }')
@@ -90,7 +90,7 @@ window.__ModuleLoader__.load({
       const css = buildCss(state)
       if (css !== null) {
         const tag = document.createElement('style')
-        tag.setAttribute('data-dsh-ui-font', '')
+        tag.setAttribute('data-dsh-custom-fonts', '')
         tag.textContent = css
         document.head.appendChild(tag)
         styleTag = tag
@@ -139,17 +139,17 @@ window.__ModuleLoader__.load({
           '自定义界面字体：UI 字体分英文与中文两栏，代码字体用于代码块与行内代码；字体留空即用默认，大小偏移为 0 即不调整。修改实时全局生效。',
         ),
         createElement(Field, {
-          label: 'UI 字体 · 英文', listId: 'dsh-ui-font-en-list', value: en,
+          label: 'UI 字体 · 英文', listId: 'dsh-custom-fonts-en-list', value: en,
           placeholder: '例如 Segoe UI, Arial', options: EN_FONTS,
           onChange: (e) => { setEn(e.target.value); applyFonts({ en: e.target.value }) },
         }),
         createElement(Field, {
-          label: 'UI 字体 · 中文', listId: 'dsh-ui-font-zh-list', value: zh,
+          label: 'UI 字体 · 中文', listId: 'dsh-custom-fonts-zh-list', value: zh,
           placeholder: '例如 微软雅黑, 思源黑体', options: ZH_FONTS,
           onChange: (e) => { setZh(e.target.value); applyFonts({ zh: e.target.value }) },
         }),
         createElement(Field, {
-          label: '代码字体', listId: 'dsh-ui-font-code-list', value: code,
+          label: '代码字体', listId: 'dsh-custom-fonts-code-list', value: code,
           placeholder: '例如 Consolas, JetBrains Mono', options: CODE_FONTS,
           onChange: (e) => { setCode(e.target.value); applyFonts({ code: e.target.value }) },
         }),
@@ -249,6 +249,6 @@ window.__ModuleLoader__.load({
       ))
     }
 
-    return { name: 'dsh-ui-font', inject: ['slots'], apply }
+    return { name: 'dsh-custom-fonts', inject: ['slots'], apply }
   },
 })

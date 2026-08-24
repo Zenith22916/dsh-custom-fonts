@@ -1,4 +1,4 @@
-// Zero-dependency smoke test for dsh-ui-font.
+// Zero-dependency smoke test for dsh-custom-fonts.
 //
 // Verifies the two load contracts this package ships:
 //   1. host half  — importable ESM exposing { name, apply }
@@ -30,7 +30,7 @@ function check(name, fn) {
 // --- host half -----------------------------------------------------------
 check('host half imports and exposes { name, apply }', async () => {
   const mod = await import(pathToFileURL(join(root, 'lib', 'index.js')).href)
-  if (mod.name !== 'dsh-ui-font') throw new Error(`name is ${mod.name}`)
+  if (mod.name !== 'dsh-custom-fonts') throw new Error(`name is ${mod.name}`)
   if (typeof mod.apply !== 'function') throw new Error('apply missing')
   mod.apply() // must not throw
 })
@@ -43,13 +43,13 @@ check('client half registers through __ModuleLoader__', async () => {
   require(join(root, 'client', 'client.js'))
   globalThis.window = undefined
   const handoff = globalThis.__handoff
-  if (!handoff || handoff.id !== 'dsh-ui-font') throw new Error('no registration with id dsh-ui-font')
+  if (!handoff || handoff.id !== 'dsh-custom-fonts') throw new Error('no registration with id dsh-custom-fonts')
 
   const surface = handoff.factory((id) => {
     if (id === 'react') return { createElement: () => {}, useState: () => ['', () => {}] }
     throw new Error('unexpected require: ' + id)
   })
-  if (surface.name !== 'dsh-ui-font') throw new Error(`name is ${surface.name}`)
+  if (surface.name !== 'dsh-custom-fonts') throw new Error(`name is ${surface.name}`)
   if (JSON.stringify(surface.inject) !== '["slots"]') throw new Error('inject must declare slots')
 
   let effectFn = null

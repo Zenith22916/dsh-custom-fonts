@@ -1,4 +1,4 @@
-# dsh-ui-font
+# dsh-custom-fonts
 
 Customize the **Chinese** and **English** fonts, the **code font**, and the **global font size** of the DeepSeek Harness Web UI — right from a settings page, with a live preview.
 
@@ -20,7 +20,7 @@ A pure client-side plugin (no host half, no restart needed). Once installed it a
 The plugin injects one global stylesheet:
 
 ```css
-:root { --dsh-ui-font-en: 'English'; --dsh-ui-font-zh: 'Chinese'; }
+:root { --dsh-custom-fonts-en: 'English'; --dsh-custom-fonts-zh: 'Chinese'; }
 body, body * { font-family: 'English font', 'Chinese font' !important; }
 pre, code, kbd, samp { font-family: 'Code font' !important; }
 body, body * { font-size: calc(1em + 2px) !important; }  /* when offset ≠ 0 */
@@ -37,20 +37,20 @@ Changes apply immediately and globally (message body, sidebar, inputs, everythin
 From the plugin market (Settings → **Plugin Market**) once the entry is published, or:
 
 ```sh
-dsh plugin --profile web add dsh-ui-font
+dsh plugin --profile web add dsh-custom-fonts
 ```
 
 or directly from the repository:
 
 ```sh
-dsh plugin --profile web add github:lsh2002/dsh-ui-font
+dsh plugin --profile web add github:lsh2002/dsh-custom-fonts
 ```
 
 Client-only plugin: after a page refresh it is live — no restart required.
 
 ## Uninstall
 
-Remove it from **Settings → Plugins → Plugin configuration** (or `dsh plugin --profile web remove dsh-ui-font`), refresh the page; your fonts are reverted automatically.
+Remove it from **Settings → Plugins → Plugin configuration** (or `dsh plugin --profile web remove dsh-custom-fonts`), refresh the page; your fonts are reverted automatically.
 
 ## License
 
