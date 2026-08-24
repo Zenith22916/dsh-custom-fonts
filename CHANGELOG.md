@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.1.0] - 2026-08-24
+
+### Added
+
+- **Code font**: a separate mono face for `pre`/`code`/`kbd`/`samp` regions (Consolas, JetBrains Mono, Fira Code, Cascadia Code, Sarasa Mono SC …), overriding the UI stack inside code regions.
+- **Global font-size offset**: a -4..+8 px slider; implemented as `calc(1em ± Npx)` relative to each element's own size, so the shift stays flat across nesting (no cascade blow-up). Zero restores the default.
+- Separate code-font preview line on the settings page.
+
+### Changed
+
+- Settings page labels now distinguish **UI fonts (English / Chinese)** from the **code font**; the reset button clears all four controls.
+
 ## [1.0.0] - 2026-08-24
 
 ### Added
