@@ -1,7 +1,7 @@
 {
   "name": "dsh-ui-font",
-  "version": "1.0.0",
-  "description": "Customize the DeepSeek Harness UI's Chinese and English fonts on a settings page with a live preview — 在设置页自定义界面中文字体与英文字体，实时预览、全局生效。",
+  "version": "1.1.0",
+  "description": "Customize the DeepSeek Harness UI's Chinese and English fonts, code font, and global font-size offset on a settings page with a live preview — 在设置页自定义界面中英文/代码字体与全局字号偏移，实时预览、全局生效。",
   "license": "MIT",
   "type": "module",
   "keywords": [
@@ -11,12 +11,17 @@
     "cordis",
     "font",
     "fonts",
+    "font-size",
+    "code font",
     "chinese",
     "english",
     "ui",
+    "等宽",
+    "代码字体",
     "字体",
     "中文字体",
-    "英文字体"
+    "英文字体",
+    "字号"
   ],
   "repository": {
     "type": "git",

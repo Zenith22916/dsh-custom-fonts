@@ -2,15 +2,20 @@
  * dsh-ui-font — client bundle.
  *
  * Customizes the global UI fonts on a settings page:
- *   - "英文字体 / English font" is used for Latin characters,
- *   - "中文字体 / Chinese font" handles CJK glyphs,
- * resolved through a CSS font-family fallback chain (English first, so
- * Latin runs through the English font and Han characters fall back to the
- * Chinese one — the standard way to split fonts by script without any
- * language detection).
+ *   - "UI fonts":  "英文字体 / English font" for Latin characters and
+ *     "中文字体 / Chinese font" for CJK glyphs, resolved through a CSS
+ *     font-family fallback chain (English first, so Latin runs through the
+ *     English font and Han characters fall back to the Chinese one — the
+ *     standard way to split fonts by script without any language detection);
+ *   - "代码字体 / code font": a separate mono face for `pre`/`code`/`kbd`/
+ *     `samp` regions, applied with priority over the UI stack;
+ *   - "字体大小偏移 / font-size offset": a global px offset (range -4..+8)
+ *     applied as `calc(1em + Npx)` relative to each element's own size —
+ *     every level shifts by exactly N, so there is no cascade blow-up.
  *
- * Pure client-only plugin (`dsh.client` without `dsh.bundle`): the market
- * shim-mounts it, changes apply on page refresh, no host half, no restart.
+ * Pure client-only plugin (host half is a no-op entry for the bundle
+ * manifest): the market shim-mounts it, changes apply on page refresh, no
+ * restart.
  *
  * Bundle shape follows the official client-modules contract:
  *   window.__ModuleLoader__.load({ id, factory })
@@ -22,8 +27,9 @@ window.__ModuleLoader__.load({
     const { createElement, useState } = require('react')
 
     // Font state lives in the bundle closure so it survives settings-page
-    // navigation. Empty means "use the product default".
-    const state = { en: '', zh: '' }
+    // navigation. Empty font means "use the product default"; size 0 means
+    // "no offset".
+    const state = { en: '', zh: '', code: '', size: 0 }
     let styleTag = null
 
     const EN_FONTS = [
@@ -35,6 +41,11 @@ window.__ModuleLoader__.load({
       '楷体', 'KaiTi', '仿宋', 'FangSong', '思源黑体', 'Noto Sans CJK SC',
       '苹方', 'PingFang SC',
     ]
+    const CODE_FONTS = [
+      'Consolas', 'Courier New', 'Menlo', 'Monaco', 'SF Mono',
+      'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Source Code Pro',
+      'DejaVu Sans Mono', 'Sarasa Mono SC', '等距更纱黑体',
+    ]
 
     // Turn user input (comma-separated font lists allowed) into quoted CSS.
     function quoteList(str) {
@@ -44,28 +55,39 @@ window.__ModuleLoader__.load({
       }).join(', ')
     }
 
-    // The global font CSS. English fonts come first so Latin characters win
-    // the English font and Han glyphs fall back to the Chinese font.
-    function buildCss(en, zh) {
-      const enQ = quoteList(en)
-      const zhQ = quoteList(zh)
-      if (!enQ && !zhQ) return null
-      const stack = [enQ, zhQ].filter(Boolean).join(', ')
+    // The global font CSS. Order matters:
+    //   1. UI stack (latin → chinese fallback)
+    //   2. code stack, later and equally specific, wins inside code regions
+    //   3. size offset, relative to each element's own size
+    function buildCss(o) {
+      const enQ = quoteList(o.en)
+      const zhQ = quoteList(o.zh)
+      const codeQ = quoteList(o.code)
+      const offset = Number(o.size) || 0
+      const rules = []
       const vars = []
       if (enQ) vars.push('--dsh-ui-font-en: ' + enQ)
       if (zhQ) vars.push('--dsh-ui-font-zh: ' + zhQ)
-      return [
-        ':root { ' + vars.join('; ') + '; }',
-        'body, body * { font-family: ' + stack + ' !important; }',
-      ].join('\n')
+      const uiStack = [enQ, zhQ].filter(Boolean).join(', ')
+      if (uiStack) {
+        rules.push('body, body * { font-family: ' + uiStack + ' !important; }')
+      }
+      if (codeQ) {
+        rules.push('pre, code, kbd, samp { font-family: ' + codeQ + ' !important; }')
+      }
+      if (offset !== 0) {
+        const sign = offset > 0 ? '+' : '-'
+        rules.push('body, body * { font-size: calc(1em ' + sign + ' ' + Math.abs(offset) + 'px) !important; }')
+      }
+      if (rules.length === 0) return null
+      return (vars.length > 0 ? ':root { ' + vars.join('; ') + '; }\n' : '') + rules.join('\n')
     }
 
-    // Apply or revert the fonts: replaces the injected <style> each time.
-    function applyFonts(en, zh) {
-      state.en = en
-      state.zh = zh
+    // Apply or revert everything: replaces the injected <style> each time.
+    function applyFonts(next) {
+      Object.assign(state, next)
       if (styleTag !== null) { styleTag.remove(); styleTag = null }
-      const css = buildCss(en, zh)
+      const css = buildCss(state)
       if (css !== null) {
         const tag = document.createElement('style')
         tag.setAttribute('data-dsh-ui-font', '')
@@ -103,7 +125,10 @@ window.__ModuleLoader__.load({
     function FontPage() {
       const [en, setEn] = useState(state.en)
       const [zh, setZh] = useState(state.zh)
-      const stack = [quoteList(en), quoteList(zh)].filter(Boolean).join(', ')
+      const [code, setCode] = useState(state.code)
+      const [size, setSize] = useState(state.size)
+      const uiStack = [quoteList(en), quoteList(zh)].filter(Boolean).join(', ')
+      const codeQ = quoteList(code)
       return createElement('div', { style: { maxWidth: 560, padding: '4px 2px' } },
         createElement('p', {
           style: {
@@ -111,40 +136,102 @@ window.__ModuleLoader__.load({
             color: 'var(--dsw-alias-label-secondary)',
           },
         },
-          '自定义界面字体：英文字体用于拉丁字符，中文字体用于汉字；两处留空即恢复默认。修改实时全局生效。',
+          '自定义界面字体：UI 字体分英文与中文两栏，代码字体用于代码块与行内代码；字体留空即用默认，大小偏移为 0 即不调整。修改实时全局生效。',
         ),
         createElement(Field, {
-          label: '英文字体', listId: 'dsh-ui-font-en-list', value: en,
+          label: 'UI 字体 · 英文', listId: 'dsh-ui-font-en-list', value: en,
           placeholder: '例如 Segoe UI, Arial', options: EN_FONTS,
-          onChange: (e) => { setEn(e.target.value); applyFonts(e.target.value, zh) },
+          onChange: (e) => { setEn(e.target.value); applyFonts({ en: e.target.value }) },
         }),
         createElement(Field, {
-          label: '中文字体', listId: 'dsh-ui-font-zh-list', value: zh,
+          label: 'UI 字体 · 中文', listId: 'dsh-ui-font-zh-list', value: zh,
           placeholder: '例如 微软雅黑, 思源黑体', options: ZH_FONTS,
-          onChange: (e) => { setZh(e.target.value); applyFonts(en, e.target.value) },
+          onChange: (e) => { setZh(e.target.value); applyFonts({ zh: e.target.value }) },
         }),
+        createElement(Field, {
+          label: '代码字体', listId: 'dsh-ui-font-code-list', value: code,
+          placeholder: '例如 Consolas, JetBrains Mono', options: CODE_FONTS,
+          onChange: (e) => { setCode(e.target.value); applyFonts({ code: e.target.value }) },
+        }),
+        createElement('div', { style: { marginBottom: 16 } },
+          createElement('div', {
+            style: {
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              marginBottom: 6,
+            },
+          },
+            createElement('label', { style: fieldLabelStyle },
+              '字体大小偏移 ',
+              createElement('span', {
+                style: { color: 'var(--dsw-alias-label-secondary)', fontWeight: 400 },
+              },
+                size > 0 ? '+' + size + 'px' : size + 'px',
+              ),
+            ),
+            size !== 0
+              ? createElement('button', {
+                  onClick: () => { setSize(0); applyFonts({ size: 0 }) },
+                  style: {
+                    fontSize: 12, padding: '2px 10px', borderRadius: 6, cursor: 'pointer',
+                    border: '1px solid var(--dsw-alias-border-l1)',
+                    background: 'var(--dsw-alias-bg-layer-2)',
+                    color: 'var(--dsw-alias-label-primary)',
+                  },
+                }, '归零')
+              : null,
+          ),
+          createElement('input', {
+            type: 'range', min: -4, max: 8, step: 1, value: size,
+            onChange: (e) => { const v = Number(e.target.value); setSize(v); applyFonts({ size: v }) },
+            style: { width: '100%' },
+          }),
+        ),
         createElement('div', {
           style: {
-            marginTop: 16, padding: '14px 16px', borderRadius: 10,
+            marginTop: 4, padding: '14px 16px', borderRadius: 10,
             border: '1px solid var(--dsw-alias-border-l1)',
             background: 'var(--dsw-alias-bg-layer-1)',
             fontSize: 15, lineHeight: 1.8, color: 'var(--dsw-alias-label-primary)',
-            fontFamily: stack || 'inherit',
+            fontFamily: uiStack || 'inherit',
           },
         },
           'The quick brown fox jumps over the lazy dog 0123456789',
           createElement('br', null),
           '敏捷的棕色狐狸跳过了懒狗 0123456789',
         ),
+        createElement('div', {
+          style: {
+            marginTop: 8, padding: '10px 16px', borderRadius: 10,
+            border: '1px solid var(--dsw-alias-border-l1)',
+            background: 'var(--dsw-alias-bg-layer-1)',
+            fontSize: 13, lineHeight: 1.8, color: 'var(--dsw-alias-label-secondary)',
+          },
+        },
+          createElement('code', {
+            style: {
+              fontFamily: codeQ || 'inherit',
+              color: 'var(--dsw-alias-label-primary)',
+              background: 'var(--dsw-alias-bg-layer-2)',
+              padding: '2px 6px', borderRadius: 4,
+            },
+          },
+            codeQ
+              ? 'const font = "ui + code"; return 0x2f;  // 代码字体预览'
+              : 'const demo = "set your code font";  // 代码字体预览',
+          ),
+        ),
         createElement('button', {
-          onClick: () => { setEn(''); setZh(''); applyFonts('', '') },
+          onClick: () => {
+            setEn(''); setZh(''); setCode(''); setSize(0)
+            applyFonts({ en: '', zh: '', code: '', size: 0 })
+          },
           style: {
             marginTop: 16, padding: '8px 16px', borderRadius: 8, cursor: 'pointer',
             border: '1px solid var(--dsw-alias-border-l1)',
             background: 'var(--dsw-alias-bg-layer-2)',
             color: 'var(--dsw-alias-label-primary)', fontSize: 13,
           },
-        }, '恢复默认字体'),
+        }, '恢复默认'),
       )
     }
 
